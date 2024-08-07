@@ -293,7 +293,7 @@ def full_pipeline(df):
 ############################# Streamlit ############################
 
 st.write("""
-# Credit card approval prediction
+# Credit Guru
 This app predicts if an applicant will be approved for a credit card or not. Just fill in the following information and click on the Predict button.
 """)
 
@@ -311,29 +311,29 @@ input_age = np.negative(st.slider('Select your age', value=42, min_value=18, max
 
 # Marital status input dropdown
 st.write("""
-## Marital status
+## Relationship Status
 """)
 marital_status_values = list(value_cnt_norm_cal(full_data, 'Marital status').index)
 marital_status_key = ['Married', 'Single/not married', 'Civil marriage', 'Separated', 'Widowed']
 marital_status_dict = dict(zip(marital_status_key, marital_status_values))
-input_marital_status_key = st.selectbox('Select your marital status', marital_status_key)
+input_marital_status_key = st.selectbox('Select your relationship status', marital_status_key)
 input_marital_status_val = marital_status_dict.get(input_marital_status_key)
 
 # Family member count
 st.write("""
-## Family member count
+## Total Family Members
 """)
-fam_member_count = float(st.selectbox('Select your family member count', [1, 2, 3, 4, 5, 6]))
+fam_member_count = float(st.selectbox('Select the total number of family members', [1, 2, 3, 4, 5, 6]))
 
 # Dwelling type dropdown
 st.write("""
-## Dwelling type
+## Housing Type
 """)
 dwelling_type_values = list(value_cnt_norm_cal(full_data, 'Dwelling').index)
 dwelling_type_key = ['House / apartment', 'Live with parents', 'Municipal apartment ', 'Rented apartment',
                      'Office apartment', 'Co-op apartment']
 dwelling_type_dict = dict(zip(dwelling_type_key, dwelling_type_values))
-input_dwelling_type_key = st.selectbox('Select the type of dwelling you reside in', dwelling_type_key)
+input_dwelling_type_key = st.selectbox('Select the type of housing you reside in', dwelling_type_key)
 input_dwelling_type_val = dwelling_type_dict.get(input_dwelling_type_key)
 
 # Income
