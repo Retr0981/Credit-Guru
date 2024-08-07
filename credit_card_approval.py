@@ -370,15 +370,15 @@ edu_level_dict = dict(zip(edu_level_key, edu_level_values))
 input_edu_level_key = st.selectbox('Select your education status', edu_level_key)
 input_edu_level_val = edu_level_dict.get(input_edu_level_key)
 
-# Car ownship input
+# Car ownership input
 st.write("""
-## Car ownship
+## Car ownership
 """)
 input_car_ownship = st.radio('Do you own a car?', ['Yes', 'No'], index=0)
 
-# Property ownship input
+# Property ownership input
 st.write("""
-## Property ownship
+## Property ownership
 """)
 input_prop_ownship = st.radio('Do you own a property?', ['Yes', 'No'], index=0)
 
