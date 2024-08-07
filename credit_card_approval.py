@@ -293,8 +293,9 @@ def full_pipeline(df):
 ############################# Streamlit ############################
 
 st.write("""
-# Credit Guru
-This app predicts if an applicant will be approved for a credit card or not. Just fill in the following information and click on the Predict button.
+# 🔮 Credit Guru
+💳✨ Fill in Your Information 📝, Click "Check For Approval" 🖱️, and Get Instant Insights on Your Approval Chances! 📈🎉
+Discover if you’re likely to be approved for a credit card in just a few clicks! Your financial future awaits! 
 """)
 
 #Gender input
