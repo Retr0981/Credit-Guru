@@ -454,7 +454,7 @@ def load_media(url: str):
         # Load Lottie animation from a JSON URL
         r = requests.get(url)
         if r.status_code != 200:
-            GIT return None
+            return None
         return r.json()
     elif url.endswith('.gif'):
         # Return the URL for GIFs directly
