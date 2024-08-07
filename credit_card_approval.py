@@ -292,28 +292,54 @@ def full_pipeline(df):
 
 ############################# Streamlit ############################
 
+# Load your full_data and train_copy datasets, full_pipeline, and value_cnt_norm_cal function here
+
+# Function to load media
+def load_media(url: str):
+    if url.endswith('.json'):
+        r = requests.get(url)
+        if r.status_code != 200:
+            return None
+        return r.json()
+    elif url.endswith('.gif'):
+        return {'type': 'gif', 'url': url}
+    elif url.endswith(('.mp4', '.webm', '.mov')):
+        return {'type': 'video', 'url': url}
+    else:
+        print("Unsupported file type.")
+        return None
+
+# Load the media
+media = load_media('creditguru.gif')
+
+# Display the media
+if media:
+    if media['type'] == 'gif':
+        st.image(media['url'],  width=350)
+    elif media['type'] == 'video':
+        st.video(media['url'])
+    else:
+        st_lottie(media)
+else:
+    st.error("Failed to load media.")
+
+# Header and description
 st.write("""
 # 🔮 Credit Guru
 💳✨ Fill in Your Information 📝, Click "Check For Approval" 🖱️, and Get Instant Insights on Your Approval Chances! 📈🎉
 Discover if you’re likely to be approved for a credit card in just a few clicks! Your financial future awaits! 
 """)
 
-#Gender input
-st.write("""
-## Gender
-""")
-input_gender = st.radio('Select you gender', ['Male', 'Female'], index=0)
+# Gender input
+st.write("## Gender")
+input_gender = st.radio('Select your gender', ['Male', 'Female'], index=0)
 
 # Age input slider
-st.write("""
-## Age
-""")
+st.write("## Age")
 input_age = np.negative(st.slider('Select your age', value=42, min_value=18, max_value=70, step=1) * 365.25)
 
 # Marital status input dropdown
-st.write("""
-## Relationship Status
-""")
+st.write("## Relationship Status")
 marital_status_values = list(value_cnt_norm_cal(full_data, 'Marital status').index)
 marital_status_key = ['Married', 'Single/not married', 'Civil marriage', 'Separated', 'Widowed']
 marital_status_dict = dict(zip(marital_status_key, marital_status_values))
@@ -321,32 +347,23 @@ input_marital_status_key = st.selectbox('Select your relationship status', marit
 input_marital_status_val = marital_status_dict.get(input_marital_status_key)
 
 # Family member count
-st.write("""
-## Total Family Members
-""")
+st.write("## Total Family Members")
 fam_member_count = float(st.selectbox('Select the total number of family members', [1, 2, 3, 4, 5, 6]))
 
 # Dwelling type dropdown
-st.write("""
-## Housing Type
-""")
+st.write("## Housing Type")
 dwelling_type_values = list(value_cnt_norm_cal(full_data, 'Dwelling').index)
-dwelling_type_key = ['House / apartment', 'Live with parents', 'Municipal apartment ', 'Rented apartment',
-                     'Office apartment', 'Co-op apartment']
+dwelling_type_key = ['House / apartment', 'Live with parents', 'Municipal apartment', 'Rented apartment', 'Office apartment', 'Co-op apartment']
 dwelling_type_dict = dict(zip(dwelling_type_key, dwelling_type_values))
 input_dwelling_type_key = st.selectbox('Select the type of housing you reside in', dwelling_type_key)
 input_dwelling_type_val = dwelling_type_dict.get(input_dwelling_type_key)
 
 # Income
-st.write("""
-## Income
-""")
+st.write("## Income")
 input_income = int(st.text_input('Enter your income (in USD)', 0))
 
 # Employment status dropdown
-st.write("""
-## Employment status
-""")
+st.write("## Employment status")
 employment_status_values = list(value_cnt_norm_cal(full_data, 'Employment status').index)
 employment_status_key = ['Working', 'Commercial associate', 'Pensioner', 'State servant', 'Student']
 employment_status_dict = dict(zip(employment_status_key, employment_status_values))
@@ -354,16 +371,11 @@ input_employment_status_key = st.selectbox('Select your employment status', empl
 input_employment_status_val = employment_status_dict.get(input_employment_status_key)
 
 # Employment length input slider
-st.write("""
-## Employment length
-""")
-input_employment_length = np.negative(
-    st.slider('Select your employment length', value=6, min_value=0, max_value=30, step=1) * 365.25)
+st.write("## Employment length")
+input_employment_length = np.negative(st.slider('Select your employment length', value=6, min_value=0, max_value=30, step=1) * 365.25)
 
 # Education level dropdown
-st.write("""
-## Education level
-""")
+st.write("## Education level")
 edu_level_values = list(value_cnt_norm_cal(full_data, 'Education level').index)
 edu_level_key = ['Secondary school', 'Higher education', 'Incomplete higher', 'Lower secondary', 'Academic degree']
 edu_level_dict = dict(zip(edu_level_key, edu_level_values))
@@ -371,37 +383,27 @@ input_edu_level_key = st.selectbox('Select your education status', edu_level_key
 input_edu_level_val = edu_level_dict.get(input_edu_level_key)
 
 # Car ownership input
-st.write("""
-## Car ownership
-""")
+st.write("## Car ownership")
 input_car_ownship = st.radio('Do you own a car?', ['Yes', 'No'], index=0)
 
 # Property ownership input
-st.write("""
-## Property ownership
-""")
+st.write("## Property ownership")
 input_prop_ownship = st.radio('Do you own a property?', ['Yes', 'No'], index=0)
 
 # Work phone input
-st.write("""
-## Work phone
-""")
+st.write("## Work phone")
 input_work_phone = st.radio('Do you have a work phone?', ['Yes', 'No'], index=0)
 work_phone_dict = {'Yes': 1, 'No': 0}
 work_phone_val = work_phone_dict.get(input_work_phone)
 
 # Phone input
-st.write("""
-## Phone
-""")
+st.write("## Phone")
 input_phone = st.radio('Do you have a phone?', ['Yes', 'No'], index=0)
 work_dict = {'Yes': 1, 'No': 0}
 phone_val = work_dict.get(input_phone)
 
 # Email input
-st.write("""
-## Email
-""")
+st.write("## Email")
 input_email = st.radio('Do you have an email?', ['Yes', 'No'], index=0)
 email_dict = {'Yes': 1, 'No': 0}
 email_val = email_dict.get(input_email)
@@ -446,59 +448,14 @@ train_copy_with_profile_to_pred_prep = full_pipeline(train_copy_with_profile_to_
 profile_to_pred_prep = train_copy_with_profile_to_pred_prep[train_copy_with_profile_to_pred_prep['ID'] == 0].drop(
     columns=['ID', 'Is high risk'])
 
-
-#Animation function
-
-def load_media(url: str):
-    # Check the file type based on the URL
-    if url.endswith('.json'):
-        # Load Lottie animation from a JSON URL
-        r = requests.get(url)
-        if r.status_code != 200:
-            return None
-        return r.json()
-    elif url.endswith('.gif'):
-        # Return the URL for GIFs directly
-        return {'type': 'gif', 'url': url}
-    elif url.endswith(('.mp4', '.webm', '.mov')):  # Add any other video formats you want to support
-        # Return the URL for video files directly
-        return {'type': 'video', 'url': url}
-    else:
-        print("Unsupported file type.")
-        return None
-
-
-# Example usage
-lottie_loading_an = load_media('https://drive.google.com/file/d/1mqZfSR0RXOGKcXHjLMgrCkhcA-EMe6PK/view?usp=sharing')
-
-media = load_media('your_media_url_here')
-
-if media:
-    if media['type'] == 'gif':
-        st.image(media['url'])  # Display the GIF
-    elif media['type'] == 'video':
-        st.video(media['url'])  # Display the video
-    else:
-        # Handle Lottie animation
-        st_lottie(media)  # You would need a function to render Lottie animations
-else:
-    st.error("Failed to load media.")
-
-
 def make_prediction(profile_to_pred_prep):
-    # Define the path to your model file
     model_path = "gradient_boosting_model.sav"
 
-    # Check if the model file exists
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
 
-    # Load the model from the local file
     model = joblib.load(model_path)
-
-    # Make predictions using the loaded model
     return model.predict(profile_to_pred_prep)
-
 
 if st.button("Check For Approval"):
     with st.spinner("Loading..."):
