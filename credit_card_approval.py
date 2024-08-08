@@ -309,13 +309,14 @@ def load_media(url: str):
         print("Unsupported file type.")
         return None
 
+
 # Load the media
 media = load_media('creditguru.gif')
 
 # Display the media
 if media:
     if media['type'] == 'gif':
-        st.image(media['url'],  width=350)
+        st.image(media['url'], width=350)
     elif media['type'] == 'video':
         st.video(media['url'])
     else:
@@ -353,7 +354,8 @@ fam_member_count = float(st.selectbox('Select the total number of family members
 # Dwelling type dropdown
 st.write("## Housing Type")
 dwelling_type_values = list(value_cnt_norm_cal(full_data, 'Dwelling').index)
-dwelling_type_key = ['House / apartment', 'Live with parents', 'Municipal apartment', 'Rented apartment', 'Office apartment', 'Co-op apartment']
+dwelling_type_key = ['House / apartment', 'Live with parents', 'Municipal apartment', 'Rented apartment',
+                     'Office apartment', 'Co-op apartment']
 dwelling_type_dict = dict(zip(dwelling_type_key, dwelling_type_values))
 input_dwelling_type_key = st.selectbox('Select the type of housing you reside in', dwelling_type_key)
 input_dwelling_type_val = dwelling_type_dict.get(input_dwelling_type_key)
@@ -372,7 +374,8 @@ input_employment_status_val = employment_status_dict.get(input_employment_status
 
 # Employment length input slider
 st.write("## Employment length")
-input_employment_length = np.negative(st.slider('Select your employment length', value=6, min_value=0, max_value=30, step=1) * 365.25)
+input_employment_length = np.negative(
+    st.slider('Select your employment length', value=6, min_value=0, max_value=30, step=1) * 365.25)
 
 # Education level dropdown
 st.write("## Education level")
@@ -448,14 +451,29 @@ train_copy_with_profile_to_pred_prep = full_pipeline(train_copy_with_profile_to_
 profile_to_pred_prep = train_copy_with_profile_to_pred_prep[train_copy_with_profile_to_pred_prep['ID'] == 0].drop(
     columns=['ID', 'Is high risk'])
 
+
 def make_prediction(profile_to_pred_prep):
-    model_path = "gradient_boosting_model.sav"
+    # Connect to S3 bucket using credentials from secrets
+    client = boto3.client(
+        's3',
+        aws_access_key_id=st.secrets["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=st.secrets["AWS_SECRET_ACCESS_KEY"],
+        region_name=st.secrets["AWS_DEFAULT_REGION"]
+    )
 
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model file not found at {model_path}")
+    bucket_name = "creditguru1"
+    key = "test.sav"
 
-    model = joblib.load(model_path)
+    # Load the model from S3 into a temporary file
+    with tempfile.TemporaryFile() as fp:
+        client.download_fileobj(Bucket=bucket_name, Key=key, Fileobj=fp)
+        fp.seek(0)
+        model = joblib.load(fp)
+
+    # Make a prediction using the loaded model
     return model.predict(profile_to_pred_prep)
+
+
 
 if st.button("Check For Approval"):
     with st.spinner("Loading..."):
