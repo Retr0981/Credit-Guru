@@ -471,18 +471,48 @@ def make_prediction(profile_to_pred_prep):
         model = joblib.load(fp)
 
     # Make a prediction using the loaded model
-    return model.predict(profile_to_pred_prep)
+    prediction = model.predict(profile_to_pred_prep)
+    return prediction
 
 
+# Assume you have your data loaded in train_original
 
 if st.button("Check For Approval"):
     with st.spinner("Loading..."):
         try:
+            # Check class distribution in the training data
+            class_distribution = train_original['Is high risk'].value_counts()
+
+            # If only one class is present, we can skip the prediction
+            if len(class_distribution) <= 1:
+                st.error("The target 'y' needs to have more than 1 class. Got 1 class instead.")
+                st.stop()  # Stop further processing
+
+            # Prepare the DataFrame for prediction
+            profile_to_predict_df = pd.DataFrame([profile_to_predict], columns=train_copy.columns)
+
+            # Add the profile to predict as a last row in the training data
+            train_copy_with_profile_to_pred = pd.concat([train_copy, profile_to_predict_df], ignore_index=True)
+
+            # Whole dataset prepared
+            train_copy_with_profile_to_pred_prep = full_pipeline(train_copy_with_profile_to_pred)
+
+            # Get the row with the ID = 0, and drop the ID, and target (placeholder) column
+            profile_to_pred_prep = train_copy_with_profile_to_pred_prep[train_copy_with_profile_to_pred_prep['ID'] == 0].drop(
+                columns=['ID', 'Is high risk'])
+
+            # Make prediction
             final_pred = make_prediction(profile_to_pred_prep)
+
+            # Provide feedback based on prediction
             if final_pred[0] == 0:
-                st.success('## You have been approved for a credit card')
-                st.balloons()
+                st.success('## You have been approved for a credit card!')
+                st.balloons()  # Visual effect
             elif final_pred[0] == 1:
-                st.error('## Unfortunately, you have not been approved for a credit card')
-        except FileNotFoundError as e:
-            st.error(str(e))
+                st.error('## Unfortunately, you have not been approved for a credit card.')
+
+        except Exception as e:
+            # Log the specific error to the session state for debugging
+            st.session_state.error_message = str(e)  # Store error details internally
+            st.error("An unexpected error occurred. Please try again.")
+            print(f"Error: {str(e)}")  # Log to console for debugging
